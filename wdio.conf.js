@@ -55,6 +55,8 @@ export const config = {
       "appium:platformVersion": "11.0", // Adjust this as needed
       "appium:automationName": "UiAutomator2",
       "appium:app": "sample_app.apk", // Path to the APK file
+      "appium:appPackage": "com.swaglabsmobileapp",
+      "appium:appActivity": "com.swaglabsmobileapp.MainActivity", // Adjust this to your main activity
     },
   ],
 

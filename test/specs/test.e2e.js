@@ -1,24 +1,25 @@
-import { expect } from '@wdio/globals'
-import LoginPage from '../pageobjects/login.page.js'
-import SecurePage from '../pageobjects/secure.page.js'
+import { expect } from "@wdio/globals";
 
-describe("Sauce Demo App Login Test", () => {
-  it("should login successfully with valid credentials", async () => {
-    // Locate the username field and input text
-    const usernameInput = await $("id:username-field-id"); // Replace with the actual ID
-    await usernameInput.setValue("standard_user");
+//Scenario 1: Verify Locked Out User
+// Scenario 1: Verify Locked Out User
+describe("Verify Locked Out User", () => {
+  it("should display an error message for a locked-out user", async () => {
+    // Use activateApp instead of execute for activating the app
+    await driver.activateApp("com.swaglabsmobileapp");
 
-    // Locate the password field and input text
-    const passwordInput = await $("id:password-field-id"); // Replace with the actual ID
-    await passwordInput.setValue("secret_sauce");
+    // Use accessibility id to locate the elements
+    const usernameField = await $('~test-Username');
+    const passwordField = await $('~test-Password');
+    const loginButton = await $('~test-LOGIN');
 
-    // Locate the login button and click it
-    const loginButton = await $("id:login-button-id"); // Replace with the actual ID
+    await usernameField.setValue("locked_out_user"); // Example value
+    await passwordField.setValue("secret_sauce"); // Example value
     await loginButton.click();
 
-    // Verify that the user is logged in by checking for a specific element
-    const homeScreenElement = await $("id:home-screen-element-id"); // Replace with the actual ID
-    await homeScreenElement.waitForDisplayed();
-    expect(await homeScreenElement.isDisplayed()).toBe(true);
+    // Assert the locked-out error message
+    const errorMessage = await $(
+      'android=new UiSelector().text("Sorry, this user has been locked out.")'
+    );
+    await expect(errorMessage).toBeDisplayed();
   });
 });

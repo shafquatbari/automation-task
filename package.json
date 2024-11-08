@@ -22,7 +22,8 @@
     "appium-safari-driver": "^3.5.18",
     "appium-uiautomator2-driver": "^3.8.1",
     "appium-wait-plugin": "^3.0.2",
-    "appium-windows-driver": "^3.0.2"
+    "appium-windows-driver": "^3.0.2",
+    "appium-xcuitest-driver": "^7.28.3"
   },
   "scripts": {
     "wdio": "wdio run ./wdio.conf.js"
