@@ -57,6 +57,7 @@ export const config = {
       "appium:app": "sample_app.apk", // Path to the APK file
       "appium:appPackage": "com.swaglabsmobileapp",
       "appium:appActivity": "com.swaglabsmobileapp.MainActivity", // Adjust this to your main activity
+      "appium:disableIdLocatorAutocompletion": true, // Disable id autocompletion
     },
   ],
 

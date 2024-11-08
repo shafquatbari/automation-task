@@ -44,8 +44,9 @@ describe("Sign in as Standard User", () => {
 
     // Scroll to the element if needed
     await driver.execute("mobile: scroll", {
-      strategy: "accessibility id",
-      selector: "test-standard_user",
+      direction: "down",
+      strategy: "-android uiautomator",
+      selector: `new UiSelector().description("test-standard_user")`,
     });
 
     // Click the selector for "standard_user" to auto-fill the fields
@@ -56,8 +57,9 @@ describe("Sign in as Standard User", () => {
 
     // Scroll to the login button
     await driver.execute("mobile: scroll", {
-      strategy: "accessibility id",
-      selector: "test-Username",
+      direction: "up",
+      strategy: "-android uiautomator",
+      selector: `new UiSelector().text("Username")`,
     });
 
     // Click the login button
@@ -82,65 +84,97 @@ describe("Sign in as Standard User", () => {
     );
     await priceLowToHigh.click();
 
-    // Scroll down to the "Add to Cart" button for Sauce Labs Fleece Jacket
-    await driver.execute("mobile: scroll", {
-      direction: "down",
-      strategy: "-android uiautomator",
-      selector: 'new UiSelector().text("Sauce Labs Fleece Jacket")',
-    });
-
-    const addToCartFleeceJacket = await $(
-      'android=new UiSelector().description("test-ADD TO CART").instance(3)'
+    // Click the "Add to Cart" button for first product
+    const addToCartProductOne = await $(
+      'android=new UiSelector().description("test-ADD TO CART").instance(1)'
     );
 
-    await addToCartFleeceJacket.click();
+    await addToCartProductOne.click();
 
-    // Store the price of the Sauce Labs Fleece Jacket
-    const fleeceJacketPrice = await $(
-      '//android.widget.TextView[@text="$49.99"]'
+    // Store the price of the first product
+    const ProductOnePrice = await $(
+      '//android.widget.TextView[@text="$9.99"]'
     ).getText();
 
-    // Assert that the "Add to Cart" button changed to "Remove"
+    //Assert that the "Add to Cart" button changed to "Remove"
     const removeButton = await $(
       'android=new UiSelector().description("test-REMOVE")'
     );
     await expect(removeButton).toBeDisplayed();
 
-    // Scroll to find the Sauce Labs Bike Light and store the price
+    const productTwoName = await $(
+      'android=new UiSelector().text("Sauce Labs Onesie")'
+    );
+    await productTwoName.click();
+
+    await driver.pause(2000);
+    //Scroll down to find the "Add to Cart" button for the Sauce Labs Bike Light
     await driver.execute("mobile: scroll", {
+      //android ui automator
       direction: "down",
       strategy: "-android uiautomator",
-      selector: 'new UiSelector().text("$9.99")',
+      selector: `new UiSelector().text("ADD TO CART")`,
+    });
+    await driver.pause(2000);
+
+    // Click the "Add to Cart" button
+    const addToCartProductTwo = await $("~test-ADD TO CART");
+    await addToCartProductTwo.click();
+
+    const cartIcon = await $("~test-Cart");
+    await cartIcon.click();
+
+    //wait for the cart page to load, pause function
+    await driver.pause(2000);
+
+    //Scroll down to
+    await driver.execute("mobile: scroll", {
+      //android ui automator
+      direction: "down",
+      strategy: "-android uiautomator",
+      selector: `new UiSelector().text("CHECKOUT")`,
     });
 
-    const bikeLightPriceElement = await $(
-      'android=new UiSelector().text("$9.99")'
-    );
-    await bikeLightPriceElement.waitForDisplayed({ timeout: 5000 });
-    const bikeLightPrice = await bikeLightPriceElement.getText();
+    await driver.pause(2000);
 
-    // Click on the Sauce Labs Bike Light product name
-    const bikeLightName = await $(
-      'android=new UiSelector().text("Sauce Labs Bike Light")'
-    );
-    await bikeLightName.click();
+    //Click the checkout button
+    const checkoutButton = await $("~test-CHECKOUT");
+    await checkoutButton.click();
 
-    // On the new page, scroll down to verify the price and name
-    const bikeLightPriceOnPage = await $(
-      'android=new UiSelector().text("$9.99")'
-    ).getText();
-    const bikeLightNameOnPage = await $(
-      'android=new UiSelector().text("Sauce Labs Bike Light")'
-    ).getText();
+    await driver.pause(2000);
 
-    // Assert the price and name on the product page
-    expect(bikeLightPriceOnPage).toBe("$9.99");
-    expect(bikeLightNameOnPage).toBe("Sauce Labs Bike Light");
+    //Enter the first name
+    const firstName = await $("~test-First Name");
+    await firstName.setValue("John");
 
-    // Click the "Add to Cart" button for the Sauce Labs Bike Light
-    const addToCartBikeLight = await $(
-      'android=new UiSelector().description("test-ADD TO CART")'
-    );
-    await addToCartBikeLight.click();
+    //Enter the last name
+    const lastName = await $("~test-Last Name");
+    await lastName.setValue("Doe");
+
+    //Enter the postal code
+    const postalCode = await $("~test-Zip/Postal Code");
+    await postalCode.setValue("12345");
+
+    await driver.pause(2000);
+
+    //Click the continue button
+    const continueButton = await $("~test-CONTINUE");
+    await continueButton.click();
+
+    await driver.pause(2000);
+
+    //scroll down to find the finish button
+    await driver.execute("mobile: scroll", {
+      //android ui automator
+      direction: "down",
+      strategy: "-android uiautomator",
+      selector: `new UiSelector().text("FINISH")`,
+    });
+
+    //Click the finish button
+    const finishButton = await $("~test-FINISH");
+    await finishButton.click();
+
+    await driver.pause(2000);
   });
 });
