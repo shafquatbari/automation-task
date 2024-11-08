@@ -1,4 +1,6 @@
 import { expect } from "@wdio/globals";
+import fs from "fs";
+import csvParser from "csv-parser";
 
 // // Scenario 1: Verify Locked Out User
 // describe("Verify Locked Out User", () => {
@@ -38,6 +40,27 @@ import { expect } from "@wdio/globals";
 
 // Scenario 2: Sign in as Standard User
 describe("Sign in as Standard User", () => {
+  let firstNameValue;
+  let lastNameValue;
+  let postalCodeValue;
+
+  // Read data from CSV
+  before(async () => {
+    const data = [];
+    await new Promise((resolve, reject) => {
+      fs.createReadStream("data.csv") // Provide the correct path
+        .pipe(csvParser())
+        .on("data", (row) => data.push(row))
+        .on("end", () => {
+          firstNameValue = data[0].FirstName;
+          lastNameValue = data[0].LastName;
+          postalCodeValue = data[0].PostalCode;
+          resolve();
+        })
+        .on("error", reject);
+    });
+  });
+
   it("should sign in successfully and navigate to the home page", async () => {
     // Activate the app
     await driver.activateApp("com.swaglabsmobileapp");
@@ -108,7 +131,7 @@ describe("Sign in as Standard User", () => {
     await productTwoName.click();
 
     await driver.pause(2000);
-    //Scroll down to find the "Add to Cart" button for the Sauce Labs Bike Light
+    //Scroll down to find the "Add to Cart" button for the second product
     await driver.execute("mobile: scroll", {
       //android ui automator
       direction: "down",
@@ -145,15 +168,15 @@ describe("Sign in as Standard User", () => {
 
     //Enter the first name
     const firstName = await $("~test-First Name");
-    await firstName.setValue("John");
+    await firstName.setValue(firstNameValue);
 
     //Enter the last name
     const lastName = await $("~test-Last Name");
-    await lastName.setValue("Doe");
+    await lastName.setValue(lastNameValue);
 
     //Enter the postal code
     const postalCode = await $("~test-Zip/Postal Code");
-    await postalCode.setValue("12345");
+    await postalCode.setValue(postalCodeValue);
 
     await driver.pause(2000);
 

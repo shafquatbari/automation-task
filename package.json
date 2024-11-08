@@ -29,6 +29,7 @@
     "wdio": "wdio run ./wdio.conf.js"
   },
   "dependencies": {
-    "appium-doctor": "^1.16.2"
+    "appium-doctor": "^1.16.2",
+    "csv-parser": "^3.0.0"
   }
 }
