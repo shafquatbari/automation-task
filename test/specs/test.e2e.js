@@ -145,10 +145,27 @@ describe("Sign in as Standard User", () => {
     await addToCartProductTwo.click();
 
     const cartIcon = await $("~test-Cart");
+    // Locate the cart icon badge element
+    const cartBadge = await $('//android.widget.TextView[@text="2"]');
+
+    // Assert that the badge text is "2"
+    await expect(cartBadge).toBeDisplayed();
+    await expect(cartBadge).toHaveText("2");
+
     await cartIcon.click();
 
     //wait for the cart page to load, pause function
     await driver.pause(2000);
+
+    // Assert both products are in the cart
+    const cartProductOne = await $(
+      'android=new UiSelector().text("Sauce Labs Onesie")'
+    );
+    const cartProductTwo = await $(
+      'android=new UiSelector().text("Sauce Labs Bike Light")'
+    );
+    await expect(cartProductOne).toBeDisplayed();
+    await expect(cartProductTwo).toBeDisplayed();
 
     //Scroll down to
     await driver.execute("mobile: scroll", {
