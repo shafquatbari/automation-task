@@ -211,10 +211,24 @@ describe("Sign in as Standard User", () => {
       selector: `new UiSelector().text("FINISH")`,
     });
 
+    // Assert item total by summing up product prices
+    const itemTotal = await $(
+      'android=new UiSelector().text("Item total: $17.98")'
+    ).getText();
+    expect(itemTotal).toBe("Item total: $17.98");
+
     //Click the finish button
     const finishButton = await $("~test-FINISH");
     await finishButton.click();
 
     await driver.pause(2000);
+    const checkoutComplete = await $(
+      'android=new UiSelector().text("CHECKOUT: COMPLETE!")'
+    );
+    await expect(checkoutComplete).toBeDisplayed();
   });
 });
+
+//new UiSelector().text("Item total: $39.98")
+
+//new UiSelector().text("CHECKOUT: COMPLETE!")
