@@ -51,7 +51,7 @@ export const config = {
   capabilities: [
     {
       platformName: "Android",
-      "appium:deviceName": "emulator-5554", // Adjust this as needed
+      "appium:deviceName": "Medium_Phone_API_30", // Adjust this as needed
       "appium:platformVersion": "11.0", // Adjust this as needed
       "appium:automationName": "UiAutomator2",
       "appium:app": "sample_app.apk", // Path to the APK file
