@@ -1,6 +1,6 @@
 const { expect, driver } = require("@wdio/globals");
 const LoginPage = require("../pageobjects/login.page");
-const SecurePage = require("../pageobjects/secure.page");
+const SecurePage = require("../pageobjects/checkout.page");
 
 describe("My Login application", () => {
   it("should login with valid credentials", async () => {
