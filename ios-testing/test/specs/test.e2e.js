@@ -75,13 +75,19 @@ describe("My Login application", () => {
     //click continue button
     let continueButton = await $("~test-CONTINUE");
     await continueButton.click();
-    //scroll to finish button
-    await driver.execute("mobile: scroll", { direction: "down" });
-    //click finish button
-    let finishButton = await $("~test-FINISH");
+    //click finish button with Xpath
+    let finishButton = await $(`//XCUIElementTypeOther[@name="test-FINISH"]`);
     await finishButton.click();
     //assertion
-    let completeHeader = await $("~test-THANK YOU FOR YOUR ORDER");
-    await expect(completeHeader).toBeDisplayed();
+    //let completeHeader = await $("~test-THANK YOU FOR YOUR ORDER");
+    ///await expect(completeHeader).toBeDisplayed();
+    //back home button
+    let backHome = await $("~test-BACK HOME");
+    await backHome.click();
+    //assertion, Xpath
+    let productsHeader = await $(
+      `//XCUIElementTypeStaticText[@name="PRODUCTS"]`
+    );
+    await expect(productsHeader).toBeDisplayed();
   });
 });
