@@ -52,12 +52,13 @@ exports.config = {
     {
       // capabilities for local Appium web tests on iOS
       platformName: "iOS",
-      "appium:deviceName": "iPhone 16 Pro",
+      "appium:deviceName": "iPhone 16 Pro Max",
       "appium:platformVersion": "18.1",
       "appium:automationName": "XCUITest",
       "appium:noReset": true,
       "appium:app":
-        "/Users/bs01094/Documents/GitHub/automation-task/ios-testing/iOS.Simulator.SauceLabs.Mobile.Sample.app.2.7.1.app",
+        "/Users/bs01094/Documents/GitHub/automation-task/ios-testing/SwagLabsMobileApp.app",
+      //"/Users/bs01094/Documents/GitHub/automation-task/ios-testing/iOS.Simulator.SauceLabs.Mobile.Sample.app.2.7.1.app",
     },
   ],
 
