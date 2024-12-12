@@ -150,12 +150,63 @@ class OrderCompletionPage {
   }
 }
 
+class SortPage {
+  get toggleViewButton() {
+    return $("~test-Toggle");
+  }
+
+  get modalSelectorButton() {
+    return $("~test-Modal Selector Button");
+  }
+
+  get priceLowToHighOption() {
+    return $("~Price (low to high)");
+  }
+
+  get firstProductAddButton() {
+    return $("(//XCUIElementTypeOther[@name='test-ADD TO CART'])[6]");
+  }
+
+  get secondProductAddButton() {
+    return $("(//XCUIElementTypeOther[@name='test-ADD TO CART'])[1]");
+  }
+
+  get cartItemCount() {
+    return $("(//XCUIElementTypeOther[@name='2'])[3]");
+  }
+
+  async sortByPrice() {
+    await this.toggleViewButton.click();
+    await driver.pause(2000);
+    await this.modalSelectorButton.click();
+    await driver.pause(2000);
+    await this.priceLowToHighOption.click();
+    await driver.pause(2000);
+  }
+
+  async addFirstProductToCart() {
+    await this.firstProductAddButton.click();
+    await driver.execute("mobile: scroll", { direction: "up" });
+    await driver.pause(2000);
+  }
+
+  async addSecondProductToCart() {
+    await this.secondProductAddButton.click();
+    await driver.pause(2000);
+  }
+
+  async verifyCartItemCount() {
+    await expect(this.cartItemCount).toBeDisplayed();
+  }
+}
+
 // Tests
 const loginPage = new LoginPage();
 const productPage = new ProductPage();
 const cartPage = new CartPage();
 const checkoutPage = new CheckoutPage();
 const orderCompletionPage = new OrderCompletionPage();
+const sortPage = new SortPage();
 
 let totalPrice = 0;
 
@@ -168,10 +219,12 @@ describe("Login Suite", () => {
 describe("Add to Cart Suite", () => {
   it("should add first item to cart and verify price", async () => {
     totalPrice += await productPage.addFirstItemToCart();
+    await expect(totalPrice).toBe(7.99);
   });
 
   it("should add second item to cart and update total price", async () => {
     totalPrice += await productPage.addSecondItemToCart();
+    await expect(totalPrice).toBe(17.98);
   });
 });
 
@@ -186,5 +239,14 @@ describe("Checkout Suite", () => {
 describe("Completion Suite", () => {
   it("should complete the order and return to home screen", async () => {
     await orderCompletionPage.completeOrder();
+  });
+});
+
+describe("Sort Suite", () => {
+  it("should sort the products by price and add items to cart", async () => {
+    await sortPage.sortByPrice();
+    await sortPage.addFirstProductToCart();
+    await sortPage.addSecondProductToCart();
+    await sortPage.verifyCartItemCount();
   });
 });
