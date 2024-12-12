@@ -24,7 +24,7 @@ exports.config = {
   specs: ["./test/specs/**/*.js"],
   // Patterns to exclude.
   exclude: [
-    // 'path/to/excluded/files'
+    "/Users/bs01094/Documents/GitHub/automation-task/ios-testing/test/specs/login.test.js",
   ],
   //
   // ============

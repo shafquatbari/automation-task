@@ -22,6 +22,13 @@ describe("My Login application", () => {
     let addToCart = await $(
       "(//XCUIElementTypeOther[@name='test-ADD TO CART'])[5]"
     );
+    let price = await $(
+      `//XCUIElementTypeStaticText[@name="test-Price" and @label="$7.99"]`
+    );
+    let priceText = await price.getText();
+    let priceWithoutDollar = priceText.replace("$", "");
+    // assert the price
+    //await expect(price).toBeDisplayed();
     //scroll a bit more to center
     await driver.execute("mobile: scroll", { direction: "down" });
     await addToCart.click();
@@ -39,6 +46,13 @@ describe("My Login application", () => {
     //scroll a bit more to center
     await driver.execute("mobile: scroll", { direction: "down" });
     await addToCart2.click();
+    let price2 = await $(`//XCUIElementTypeStaticText[@name="test-Price"]`);
+    let priceText2 = await price2.getText();
+    let priceWithoutDollar2 = priceText2.replace("$", "");
+    let totalprice =
+      parseFloat(priceWithoutDollar) + parseFloat(priceWithoutDollar2);
+    // assert the price
+    //await expect(price2).toBeDisplayed();
     // click the back button
     let backButton = await $("~test-BACK TO PRODUCTS");
     await backButton.click();
@@ -75,8 +89,18 @@ describe("My Login application", () => {
     //click continue button
     let continueButton = await $("~test-CONTINUE");
     await continueButton.click();
+    //XCUIElementTypeStaticText[@name="Item total: ${totalprice}"] verify this
+    // Assert that the total price is equal to 17.98
+    // Assert with the xpath that is displayed
+    // let total = await $(
+    //   `//XCUIElementTypeStaticText[@name="Item total: $${totalprice}"]`
+    // );
+    // accessibility id: Item total: $17.98
+    let total = await $(`~Item total: $${totalprice}`);
+    await expect(17.98).toEqual(totalprice); // this works
     //click finish button with Xpath
     let finishButton = await $(`//XCUIElementTypeOther[@name="test-FINISH"]`);
+    driver.pause(2000);
     await finishButton.click();
     //assertion
     //let completeHeader = await $("~test-THANK YOU FOR YOUR ORDER");
