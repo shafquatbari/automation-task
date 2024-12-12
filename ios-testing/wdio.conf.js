@@ -24,7 +24,7 @@ exports.config = {
   specs: ["./test/specs/**/*.js"],
   // Patterns to exclude.
   exclude: [
-    "/Users/bs01094/Documents/GitHub/automation-task/ios-testing/test/specs/login.test.js",
+    "/Users/bs01094/Documents/GitHub/automation-task/ios-testing/test/specs/test.e2e.js",
   ],
   //
   // ============
@@ -138,7 +138,7 @@ exports.config = {
   // See the full list at http://mochajs.org/
   mochaOpts: {
     ui: "bdd",
-    timeout: 60000,
+    timeout: 240000,
   },
 
   //

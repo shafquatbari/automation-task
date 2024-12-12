@@ -1,24 +1,26 @@
 const { expect, driver } = require("@wdio/globals");
-const LoginPage = require("../pageobjects/login.page");
-const SecurePage = require("../pageobjects/checkout.page");
 
-describe("My Login application", () => {
+let totalprice = 0;
+
+describe("Login Suite", () => {
   it("should login with valid credentials", async () => {
-    //Username box
     let username = await $("~test-Username");
-    //Fill this with the collected username
-    //scroll down and do nothing and then scroll up
     await driver.execute("mobile: scroll", { direction: "down" });
     await driver.execute("mobile: scroll", { direction: "up" });
     await username.setValue("standard_user");
-    // Password box
+
     let password = await $("~test-Password");
-    //Fill this with the collected password
     await password.setValue("secret_sauce");
-    // Login button
+
     let loginButton = await $("~test-LOGIN");
     await loginButton.click();
-    //scroll to the element if needed, with xpath
+
+    await expect(loginButton).not.toBeDisplayed();
+  });
+});
+
+describe("Add to Cart Suite", () => {
+  it("should add first item to cart and verify price", async () => {
     let addToCart = await $(
       "(//XCUIElementTypeOther[@name='test-ADD TO CART'])[5]"
     );
@@ -27,53 +29,56 @@ describe("My Login application", () => {
     );
     let priceText = await price.getText();
     let priceWithoutDollar = priceText.replace("$", "");
-    // assert the price
-    //await expect(price).toBeDisplayed();
-    //scroll a bit more to center
+
     await driver.execute("mobile: scroll", { direction: "down" });
     await addToCart.click();
-    //scroll to the element if needed, with xpath
+    await driver.pause(2000);
+
+    await expect(price).toBeDisplayed();
+    totalprice += parseFloat(priceWithoutDollar);
+  });
+
+  it("should add second item to cart and update total price", async () => {
     let sauceLabsBikeLight = await $(
       `//XCUIElementTypeStaticText[@name="test-Item title" and @label="Sauce Labs Bike Light"]`
     );
-    //scroll a bit more to center
     await driver.execute("mobile: scroll", { direction: "up" });
     await sauceLabsBikeLight.click();
-    //scroll to the element if needed, with xpath
+
     let addToCart2 = await $(
       `//XCUIElementTypeOther[@name="test-ADD TO CART"]`
     );
-    //scroll a bit more to center
     await driver.execute("mobile: scroll", { direction: "down" });
     await addToCart2.click();
+
     let price2 = await $(`//XCUIElementTypeStaticText[@name="test-Price"]`);
     let priceText2 = await price2.getText();
     let priceWithoutDollar2 = priceText2.replace("$", "");
-    let totalprice =
-      parseFloat(priceWithoutDollar) + parseFloat(priceWithoutDollar2);
-    // assert the price
-    //await expect(price2).toBeDisplayed();
-    // click the back button
-    let backButton = await $("~test-BACK TO PRODUCTS");
-    await backButton.click();
-    //scroll up to find the cart button
-    await driver.execute("mobile: scroll", { direction: "up" });
-    // Find and click cart button with xpath
+    totalprice += parseFloat(priceWithoutDollar2);
+
+    await expect(price2).toBeDisplayed();
+  });
+});
+
+describe("Checkout Suite", () => {
+  it("should checkout and verify total price", async () => {
     let cartButton = await $("~test-Cart");
     await cartButton.click();
-    // Find and click checkout button
+
+    await driver.execute("mobile: scroll", { direction: "down" });
+
     let checkoutButton = await $("~test-CHECKOUT");
     await checkoutButton.click();
-    //enter first name
+
     let firstName = await $("~test-First Name");
     await firstName.setValue("Shafquat");
-    //enter last name
+
     let lastName = await $("~test-Last Name");
     await lastName.setValue("Bari");
-    //enter postal code
+
     let postalCode = await $("~test-Zip/Postal Code");
     await postalCode.setValue("12345");
-    //press center of the screen to hide the keyboard
+
     await driver.performActions([
       {
         type: "pointer",
@@ -86,32 +91,76 @@ describe("My Login application", () => {
         ],
       },
     ]);
-    //click continue button
+    await driver.execute("mobile: scroll", { direction: "down" });
+
     let continueButton = await $("~test-CONTINUE");
     await continueButton.click();
-    //XCUIElementTypeStaticText[@name="Item total: ${totalprice}"] verify this
-    // Assert that the total price is equal to 17.98
-    // Assert with the xpath that is displayed
-    // let total = await $(
-    //   `//XCUIElementTypeStaticText[@name="Item total: $${totalprice}"]`
-    // );
-    // accessibility id: Item total: $17.98
+    await driver.execute("mobile: scroll", { direction: "down" });
+    await driver.pause(2000);
+    // find the locator for the total price
     let total = await $(`~Item total: $${totalprice}`);
-    await expect(17.98).toEqual(totalprice); // this works
-    //click finish button with Xpath
+    await expect(total).toBeDisplayed();
+    await expect(17.98).toEqual(totalprice);
+  });
+});
+
+describe("Completion Suite", () => {
+  it("should complete the order and return to home screen", async () => {
     let finishButton = await $(`//XCUIElementTypeOther[@name="test-FINISH"]`);
-    driver.pause(2000);
+    await driver.pause(2000);
     await finishButton.click();
-    //assertion
-    //let completeHeader = await $("~test-THANK YOU FOR YOUR ORDER");
-    ///await expect(completeHeader).toBeDisplayed();
-    //back home button
+
+    await driver.pause(2000);
+
     let backHome = await $("~test-BACK HOME");
     await backHome.click();
-    //assertion, Xpath
+
     let productsHeader = await $(
       `//XCUIElementTypeStaticText[@name="PRODUCTS"]`
     );
     await expect(productsHeader).toBeDisplayed();
+  });
+});
+
+describe("Sort Suite", () => {
+  it("should sort the products by price", async () => {
+    let toggleViewButton = await $("~test-Toggle");
+    await toggleViewButton.click();
+    await driver.pause(2000);
+
+    let modalSelector = await $("~test-Modal Selector Button");
+    await modalSelector.click();
+    await driver.pause(2000);
+
+    let priceLowToHigh = await $("~Price (low to high)");
+    await priceLowToHigh.click();
+    await driver.pause(2000);
+
+    let price1 = await $(
+      `//XCUIElementTypeStaticText[@name="test-Price" and @label="$49.99"]`
+    );
+
+    let addButton1 = await $(
+      `(//XCUIElementTypeOther[@name="test-ADD TO CART"])[6]`
+    );
+
+    await addButton1.click();
+
+    await driver.execute("mobile: scroll", { direction: "up" });
+    await driver.pause(2000);
+
+    let price2 = await $(
+      `//XCUIElementTypeStaticText[@name="test-Price" and @label="$7.99"]`
+    );
+
+    let addButton2 = await $(
+      `(//XCUIElementTypeOther[@name="test-ADD TO CART"])[1]`
+    );
+
+    await addButton2.click();
+    await driver.pause(2000);
+
+    let cartNumbers = await $(`(//XCUIElementTypeOther[@name="2"])[3]`);
+    await expect(cartNumbers).toBeDisplayed();
   });
 });
