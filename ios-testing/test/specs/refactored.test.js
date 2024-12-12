@@ -43,6 +43,10 @@ class ProductPage {
     );
   }
 
+  get secondItemPrice() {
+    return $("//XCUIElementTypeStaticText[@name='test-Price']");
+  }
+
   async addFirstItemToCart() {
     const priceText = await this.firstItemPrice.getText();
     const priceWithoutDollar = priceText.replace("$", "");
@@ -58,7 +62,7 @@ class ProductPage {
     await driver.execute("mobile: scroll", { direction: "down" });
     await this.addToCartButtonSecondItem.click();
 
-    const priceText = await this.firstItemPrice.getText();
+    const priceText = await this.secondItemPrice.getText();
     const priceWithoutDollar = priceText.replace("$", "");
     return parseFloat(priceWithoutDollar);
   }
