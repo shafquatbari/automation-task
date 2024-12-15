@@ -1,3 +1,10 @@
+import { specs, suites } from "./specsAndSuites.js";
+let stateCounts = {
+  passed: 0,
+  failed: 0,
+  skipped: 0,
+};
+
 export const config = {
   //
   // ====================
@@ -21,11 +28,9 @@ export const config = {
   // The path of the spec files will be resolved relative from the directory of
   // of the config file unless it's absolute.
   //
-  specs: ["./test/specs/**/*.js"],
-  // Patterns to exclude.
-  exclude: [
-    // 'path/to/excluded/files'
-  ],
+  // No specs are defined, so we will use the suites defined in the specsAndSuites.js file
+  specs: [],
+  suites: suites,
   //
   // ============
   // Capabilities
@@ -298,4 +303,33 @@ export const config = {
    */
   // afterAssertion: function(params) {
   // }
+
+  beforeTest: function (test) {
+    console.log(`Starting test: ${test.title}`);
+  },
+
+  // Other configurations...
+
+  afterTest: function (test, context, { passed, error }) {
+    console.log(
+      `Test: ${test.title}, Passed: ${passed}, Error: ${
+        error ? error.message : "None"
+      }`
+    );
+
+    if (passed == true) {
+      stateCounts.passed++;
+    } else if (error) {
+      stateCounts.failed++;
+    } else {
+      stateCounts.skipped++;
+    }
+  },
+
+  onComplete: function () {
+    console.log("\n=== Test Execution Summary ===");
+    console.log(`Passed tests: ${stateCounts.passed}`);
+    console.log(`Failed tests: ${stateCounts.failed}`);
+    console.log(`Skipped tests: ${stateCounts.skipped}`);
+  },
 };
