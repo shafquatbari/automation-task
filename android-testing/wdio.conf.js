@@ -5,6 +5,11 @@ let stateCounts = {
   skipped: 0,
 };
 
+let suiteCounts = {
+  passed: 0,
+  failed: 0,
+};
+
 export const config = {
   //
   // ====================
@@ -304,32 +309,46 @@ export const config = {
   // afterAssertion: function(params) {
   // }
 
-  beforeTest: function (test) {
-    console.log(`Starting test: ${test.title}`);
+  beforeSuite: function (suite) {
+    console.log(`Starting suite: ${suite.title || "Unnamed Suite"}`);
+    console.log(`Suite Count Before: ${JSON.stringify(suiteCounts)}`);
   },
 
-  // Other configurations...
+  afterSuite: function (suite) {
+    console.log(`Finished suite: ${suite.title || "Unnamed Suite"}`);
+    if (suite.tests && Array.isArray(suite.tests)) {
+      const suitePassed = suite.tests.every((test) => test.state === "passed");
+      if (suitePassed) {
+        suiteCounts.passed++;
+      } else {
+        suiteCounts.failed++;
+      }
+    }
+    console.log(`Suite Count After: ${JSON.stringify(suiteCounts)}`);
+  },
+
+  beforeTest: function (test) {
+    console.log(`Starting test: ${test.title}`);
+    console.log(`State Count Before: ${JSON.stringify(stateCounts)}`);
+  },
 
   afterTest: function (test, context, { passed, error }) {
-    console.log(
-      `Test: ${test.title}, Passed: ${passed}, Error: ${
-        error ? error.message : "None"
-      }`
-    );
-
-    if (passed == true) {
+    if (passed) {
       stateCounts.passed++;
     } else if (error) {
       stateCounts.failed++;
     } else {
       stateCounts.skipped++;
     }
+    console.log(
+      `Test result - Passed: ${passed}, Skipped: ${!error && !passed}`
+    );
+    console.log(`State Count After: ${JSON.stringify(stateCounts)}`);
   },
 
-  onComplete: function () {
+  onComplete: async function (exitCode, config, capabilities, results) {
     console.log("\n=== Test Execution Summary ===");
-    console.log(`Passed tests: ${stateCounts.passed}`);
-    console.log(`Failed tests: ${stateCounts.failed}`);
-    console.log(`Skipped tests: ${stateCounts.skipped}`);
+    console.log(`State Counts: ${JSON.stringify(stateCounts)}`);
+    console.log(`Suite Counts: ${JSON.stringify(suiteCounts)}`);
   },
 };
