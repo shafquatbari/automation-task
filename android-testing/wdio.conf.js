@@ -1,13 +1,17 @@
 import { specs, suites } from "./specsAndSuites.js";
-let stateCounts = {
-  passed: 0,
-  failed: 0,
-  skipped: 0,
-};
+import fs from "fs";
+import path from "path";
 
-let suiteCounts = {
-  passed: 0,
-  failed: 0,
+// Path for the temporary results file
+const tempResultsPath = "test-results-temp.json"
+
+// Initialize stateCounts and suiteCounts in the file
+const initializeResultsFile = () => {
+  const initialData = {
+    stateCounts: { passed: 0, failed: 0, skipped: 0 },
+    suiteCounts: { passed: 0, failed: 0 },
+  };
+  fs.writeFileSync(tempResultsPath, JSON.stringify(initialData, null, 2));
 };
 
 export const config = {
@@ -309,46 +313,64 @@ export const config = {
   // afterAssertion: function(params) {
   // }
 
+  onPrepare: function () {
+    console.log("Initializing results file...");
+    initializeResultsFile();
+  },
+
   beforeSuite: function (suite) {
     console.log(`Starting suite: ${suite.title || "Unnamed Suite"}`);
-    console.log(`Suite Count Before: ${JSON.stringify(suiteCounts)}`);
   },
 
   afterSuite: function (suite) {
-    console.log(`Finished suite: ${suite.title || "Unnamed Suite"}`);
+    // Update suiteCounts in the temporary file
+    const results = JSON.parse(fs.readFileSync(tempResultsPath, 'utf8'));
+
     if (suite.tests && Array.isArray(suite.tests)) {
       const suitePassed = suite.tests.every((test) => test.state === "passed");
       if (suitePassed) {
-        suiteCounts.passed++;
+        results.suiteCounts.passed++;
       } else {
-        suiteCounts.failed++;
+        results.suiteCounts.failed++;
       }
     }
-    console.log(`Suite Count After: ${JSON.stringify(suiteCounts)}`);
+
+    fs.writeFileSync(tempResultsPath, JSON.stringify(results, null, 2));
   },
 
   beforeTest: function (test) {
     console.log(`Starting test: ${test.title}`);
-    console.log(`State Count Before: ${JSON.stringify(stateCounts)}`);
   },
 
   afterTest: function (test, context, { passed, error }) {
+    // Update stateCounts in the temporary file
+    const results = JSON.parse(fs.readFileSync(tempResultsPath, 'utf8'));
+
     if (passed) {
-      stateCounts.passed++;
+      results.stateCounts.passed++;
     } else if (error) {
-      stateCounts.failed++;
+      results.stateCounts.failed++;
     } else {
-      stateCounts.skipped++;
+      results.stateCounts.skipped++;
     }
-    console.log(
-      `Test result - Passed: ${passed}, Skipped: ${!error && !passed}`
-    );
-    console.log(`State Count After: ${JSON.stringify(stateCounts)}`);
+
+    fs.writeFileSync(tempResultsPath, JSON.stringify(results, null, 2));
+    console.log(`Updated results: ${JSON.stringify(results.stateCounts)}`);
   },
 
-  onComplete: async function (exitCode, config, capabilities, results) {
-    console.log("\n=== Test Execution Summary ===");
-    console.log(`State Counts: ${JSON.stringify(stateCounts)}`);
-    console.log(`Suite Counts: ${JSON.stringify(suiteCounts)}`);
+  onComplete: function () {
+    // Read and display final results from the file
+    const finalResults = JSON.parse(fs.readFileSync(tempResultsPath, 'utf8'));
+
+    console.log("\n=== Final Test Execution Summary ===");
+    console.log(`Total Passed Tests: ${finalResults.stateCounts.passed}`);
+    console.log(`Total Failed Tests: ${finalResults.stateCounts.failed}`);
+    console.log(`Total Skipped Tests: ${finalResults.stateCounts.skipped}`);
+    console.log(`Suites Passed: ${finalResults.suiteCounts.passed}`);
+    console.log(`Suites Failed: ${finalResults.suiteCounts.failed}`);
+
+    // Delete the temporary results file
+    fs.unlinkSync(tempResultsPath);
+    console.log("Temporary results file deleted.");
   },
 };
